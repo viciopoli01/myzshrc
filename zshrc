@@ -97,9 +97,58 @@ source $ZSH/oh-my-zsh.sh
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
-
+alias emulator="/home/viciopoli/Android/Sdk/tools/emulator"
 alias cl="clear"
 alias py="python3"
+
+#
+# FLUTTER EXPORT
+#
+export PATH=~/flutter/bin:$PATH
+
+
+
+#
+# GOOGLE JAM COMPETITION
+#
+
+jam_template(){
+    if [ -z "$*" ]; then
+            echo "You need to provide the prj name."
+    else
+        if [ -e "$1.cpp" ]; then
+            echo "File $1.cpp exists!"
+            g++ -o $1 $1.cpp
+            echo "Completed!"
+            ./$1
+        else
+            echo "Creating $1.cpp"
+            echo  "#include <bits/stdc++.h>" >> $1.cpp
+            #echo  "#include <iostream>" >> $1.cpp
+            #echo  "#include <string>" >> $1.cpp
+            #echo  "#include <vector>" >> $1.cpp
+
+            echo  "\n#define rep(a) for(int i=0; i<a;i++)" >> $1.cpp
+
+            echo "using namespace std;" >> $1.cpp
+
+            echo  "\n\nint main(){\n" >> $1.cpp
+            echo "\tint T;" >> $1.cpp
+            echo "\tcin>>T;" >> $1.cpp
+            echo "\trep(T){\n" >> $1.cpp
+            echo "\t\tint N;" >> $1.cpp
+            echo "\t\tcin>>N;" >> $1.cpp
+            echo "\t\tcout<<\"Case #\"<<(i+1)<<\": \"<<endl;" >> $1.cpp
+            echo "\n\t}" >> $1.cpp
+            echo "\treturn 0;\n}" >> $1.cpp
+            
+            
+            echo "Completed!"
+        fi
+    fi
+}
+
+
 #
 # OPENCV COMPILER HELPER
 #
@@ -121,6 +170,7 @@ init_opencv(){
             echo "Creating CMakeLists.txt"
             echo  "cmake_minimum_required(VERSION 2.8) \n
             project( $1 ) \n
+            set(OpenCV_DIR /home/viciopoli/Installation/opencv/share/OpenCV) \n
             find_package( OpenCV REQUIRED ) \n
             include_directories( \${OpenCV_INCLUDE_DIRS} ) \n
             add_executable( $1.bin $1.cpp ) \n
@@ -169,18 +219,216 @@ init_openpose(){
 #
 #   ROS
 #
-source /opt/ros/kinetic/setup.zsh
-
+source /opt/ros/melodic/setup.zsh
 source /home/viciopoli/visensor_ws/devel/setup.zsh
-
-alias pip=pip3.6
-
+#source /home/viciopoli/vulcano_ws/devel/setup.zsh
+#source /home/viciopoli/vibagcreator_ws/devel/setup.zsh
+#source /home/viciopoli/Desktop/SemesterPRJ/cvi-slam_ws/devel/setup.zsh
 
 #
 #   create VI Sensor Simulator workspace
 #
 
+vulkano_create(){
+    #"sudo apt-get install libglm-dev"
+    #wget -qO - http://packages.lunarg.com/lunarg-signing-key-pub.asc | sudo apt-key add -
+    #sudo wget -qO /etc/apt/sources.list.d/lunarg-vulkan-1.2.131-bionic.list http://packages.lunarg.com/vulkan/1.2.131/lunarg-vulkan-1.2.131-bionic.list
+    #sudo apt update
+    #sudo apt install vulkan-sdk
+}
+
+vibag_create(){
+    if [ -d "$HOME/vibagcreator_ws" ]; 
+    then
+        echo "A workspace in this position already exists"
+    else
+        mkdir -p $HOME/vibagcreator_ws/src
+        cd $HOME/vibagcreator_ws
+        catkin init
+        catkin config --cmake-args -DCMAKE_BUILD_TYPE=Release
+
+        cd src
+        check_apt_package "liblapacke-dev"
+        check_apt_package "doxygen"
+        git clone git@github.com:catkin/catkin_simple
+        git clone git@github.com:ethz-asl/eigen_catkin
+        git clone git@github.com:ethz-asl/Schweizer-Messer.git
+
+        git clone git@github.com:VIS4ROB-lab/vi_bag_tools.git
+
+        cd ..
+
+        catkin build
+
+        source $HOME/vibagcreator_ws/devel/setup.$(ps -p $$ -oargs=)
+
+    fi
+}
+
+
+cvi-slam_create(){
+    if [ -d "$PWD/cvi-slam_ws" ]; 
+    then
+        echo "A workspace in this position already exists"
+    else
+        CURREND_DIR=$PWD
+
+        mkdir -p $PWD/cvi-slam_ws/src
+
+        SOURCE_PATH=$CURREND_DIR/cvi-slam_ws/devel/setup.$(ps -p $$ -oargs=)
+
+        cd $CURREND_DIR/cvi-slam_ws
+        catkin init
+        catkin config --merge-devel
+
+        cd src
+
+        git clone git@github.com:catkin/catkin_simple.git
+        git clone git@github.com:ethz-asl/eigen_catkin.git
+        git clone git@github.com:ethz-asl/gflags_catkin.git
+        git clone git@github.com:ethz-asl/glog_catkin.git
+        git clone git@github.com:ethz-asl/eigen_checks.git
+        git clone git@github.com:ethz-asl/opencv3_catkin.git
+        git clone https://github.com/ethz-asl/protobuf_catkin.git
+        git clone git@github.com:ethz-asl/ethzasl_brisk.git
+        git clone git@github.com:ethz-asl/suitesparse.git        
+        git clone git@github.com:ethz-asl/ceres_catkin.git
+        git clone git@github.com:ethz-asl/opengv.git
+        git clone git@github.com:ethz-asl/yaml_cpp_catkin.git
+        git clone git@github.com:ethz-asl/catkin_boost_python_buildtool.git
+        git clone git@github.com:ethz-asl/schweizer_messer.git        
+        git clone git@github.com:ethz-asl/minkindr.git
+        git clone git@github.com:ethz-asl/doxygen_catkin.git
+        git clone git@github.com:ethz-asl/aslam_cv2.git
+        git clone https://github.com/VIS4ROB-lab/robopt.git
+        git clone https://github.com/patriksc/estd.git
+        git clone https://github.com/VIS4ROB-lab/v4rl_param_lib.git
+        git clone https://github.com/VIS4ROB-lab/cvi_slam_dumper_pr.git
+
+        #
+        # EDIT FILES
+        #
+
+        # eigen_catkin
+
+        cd eigen_catkin
+        git checkout htwfnc-eigen33
+        sed -i '13d' CMakeLists.txt
+        sed -i '12aset(EIGEN_MINIMUM_VERSION 3.3.7)' CMakeLists.txt
+        sed -i '88d' CMakeLists.txt
+        sed -i '87a\ \ \ \ URL http://bitbucket.org/eigen/eigen/get/3.3.7.tar.bz2' CMakeLists.txt
+        if [ ${UDIST} = "bionic" ]
+        then
+            sed -i '46aset(USE_SYSTEM_EIGEN "OFF")' CMakeLists.txt
+        fi
+        cd ..
+
+        # ceres_catkin
+
+        cd ceres_catkin
+        sed -i '6afind_package(eigen_catkin REQUIRED)' CMakeLists.txt
+        sed -i '7afind_package(Eigen3 3.3.7 EXACT REQUIRED)' CMakeLists.txt
+        sed -i '8a' CMakeLists.txt
+        sed -i '13a\ \ <buildtool_depend>eigen_catkin</buildtool_depend>' package.xml
+        sed -i '17a\ \ <build_depend>eigen_catkin</build_depend>' package.xml
+        cd ..
+
+        # opengv
+        
+        cd opengv
+        sed -i '162d' CMakeLists.txt
+        sed -i '161a\ \ \ \ \ \ find_package(eigen_catkin REQUIRED)' CMakeLists.txt
+        sed -i '162a\ \ \ \ \ \ find_package(Eigen3 3.3.7 EXACT REQUIRED)' CMakeLists.txt
+        sed -i '164d' CMakeLists.txt
+        sed -i '163a\ \ \ \ \ \ set(EIGEN_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/../../devel/include/eigen3)' CMakeLists.txt
+        sed -i '164a\ \ \ \ \ \ include_directories(${EIGEN_INCLUDE_DIR} ${EIGEN_INCLUDE_DIR}/unsupported)' CMakeLists.txt
+        sed -i '167d' CMakeLists.txt
+        sed -i '166a\ \ \ \ \ \ message(WARNING "Eigen: " ${EIGEN_INCLUDE_DIR})' CMakeLists.txt
+        cd ..
+
+        # robopt
+
+        cd robopt
+        git checkout -b fix/preintegration origin/fix/preintegration
+        cd ..
+
+        # schweizer_messer
+        
+        cd schweizer_messer
+        cd sm_boost; touch CATKIN_IGNORE; cd ..;
+        cd sm_common; touch CATKIN_IGNORE; cd ..;
+        cd sm_deprecation; touch CATKIN_IGNORE; cd ..;
+        cd sm_doc; touch CATKIN_IGNORE; cd ..;
+        cd sm_eigen; touch CATKIN_IGNORE; cd ..;
+        cd sm_kinematics; touch CATKIN_IGNORE; cd ..;
+        cd sm_logging; touch CATKIN_IGNORE; cd ..;
+        cd sm_matlab; touch CATKIN_IGNORE; cd ..;
+        cd sm_matrix_archive; touch CATKIN_IGNORE; cd ..;
+        cd sm_opencv; touch CATKIN_IGNORE; cd ..;
+        cd sm_property_tree; touch CATKIN_IGNORE; cd ..;
+        cd sm_python; touch CATKIN_IGNORE; cd ..;
+        cd sm_random; touch CATKIN_IGNORE; cd ..;
+        cd sm_timing; touch CATKIN_IGNORE; cd ..;
+        cd sm_value_store; touch CATKIN_IGNORE; cd ..;
+        cd ..
+
+        # aslam_cv2
+
+        cd aslam_cv2
+        cd aslam_cv_calibration; touch CATKIN_IGNORE; cd ..;
+        cd aslam_cv_detector; touch CATKIN_IGNORE; cd ..;
+        cd aslam_cv_frames; touch CATKIN_IGNORE; cd ..;
+        cd aslam_cv_geometric_vision; touch CATKIN_IGNORE; cd ..;
+        cd aslam_cv_matcher; touch CATKIN_IGNORE; cd ..;
+        cd aslam_cv_pipeline; touch CATKIN_IGNORE; cd ..;
+        cd aslam_cv_tracker; touch CATKIN_IGNORE; cd ..;
+        cd aslam_cv_triangulation; touch CATKIN_IGNORE; cd ..;
+        cd aslam_cv_visualization; touch CATKIN_IGNORE; cd ..;
+        cd ..
+
+        # cvi_slam_dumper_pr
+        
+        cd $CURREND_DIR/cvi-slam_ws/src/cvi_slam_dumper_pr
+        cd cvislam/conf
+        unzip ORBvoc.txt.zip
+        
+        cd ..
+        sed -i '31d' CMakeLists.txt
+        sed -i '31d' CMakeLists.txt
+        sed -i '30aset(EIGEN_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/../../../devel/include/eigen3)' CMakeLists.txt
+        sed -i '31aset(EIGEN_INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/../../../devel/include/eigen3)' CMakeLists.txt
+        
+        cd /trd_party/v4rl_mesh_based_mapping_lib/include/mesh_based_mapping/
+        sed -i '31a#include <vector>' mesh_based_mapping.hpp
+        
+        cd $CURREND_DIR/cvi-slam_ws/src/cvi_slam_dumper_pr/cvislam/src/redundancy_detection/
+
+        sed -i '2401d' redundancy_detector_base.cpp
+        sed -i '2401acovopts.algorithm_type = ceres::CovarianceAlgorithmType::SPARSE_QR;' redundancy_detector_base.cpp
+
+        #
+        # build workspace
+        #
+
+        cd $CURREND_DIR/cvi-slam_ws/
+        catkin build cvislam
+
+        source $CURREND_DIR/cvi-slam_ws/devel/setup.$(ps -p $$ -oargs=)
+        
+    fi
+}
+
 visensor_create(){
+    UDIST=$(lsb_release -sc)
+    echo "Ubuntu release: ${UDIST}"
+    
+    joy="ros-kinetic-joy"
+    octomap="ros-kinetic-octomap-ros"
+    if [ ${UDIST} = "bionic" ]
+    then
+        joy="ros-melodic-joy"
+        octomap="ros-melodic-octomap-ros"
+    fi
     apt_pack=("liblapacke-dev" 
             "python-wstool"
             "python-catkin-tools"
@@ -188,12 +436,13 @@ visensor_create(){
             "libgoogle-glog-dev"
             "libopenexr-dev"
             "libopenblas-dev"
-            "ros-kinetic-joy"
-            "ros-kinetic-octomap-ros")
+            $joy
+            $octomap)
     pip_pack=("catkin_tools" "OpenEXR")
 
-    if [ ! "~/visensor_ws" ]; then
-        echo "a workspace in this position already exists"
+    if [ -d "$HOME/visensor_ws" ]; 
+    then
+        echo "A workspace in this position already exists"
     else
         for i in "${apt_pack[@]}";do
             check_apt_package "$i"
@@ -203,12 +452,12 @@ visensor_create(){
             check_pip_package "$i"
         done
         
-        mkdir -p ~/visensor_ws/src
-        cd ~/visensor_ws 
+        mkdir -p $HOME/visensor_ws/src
+        cd $HOME/visensor_ws 
         catkin init
         catkin config --cmake-args -DCMAKE_BUILD_TYPE=Release
 
-        cd ~/visensor_ws/src
+        cd $HOME/visensor_ws/src
         git clone git@github.com:catkin/catkin_simple
         git clone git@github.com:ethz-asl/rotors_simulator
         git clone git@github.com:ethz-asl/mav_comm
@@ -217,11 +466,26 @@ visensor_create(){
         git clone git@github.com:ethz-asl/mav_control_rw
         git clone git@github.com:VIS4ROB-lab/visensor_simulator.git
         cd visensor_simulator
-        git checkout devel
-        cd ~/visensor_ws
-        catkin build visensor_simulator
+        if [ ${UDIST} = "bionic" ]
+        then
+            git checkout blender_2.8
+            cd $HOME/visensor_ws
 
-        source ~/visensor_ws/devel/setup.$0
+            sed -i '10,15 s/^/#/' $HOME/visensor_ws/src/mav_control_rw/mav_nonlinear_mpc/CMakeLists.txt
+            sed -i '19 s/^/#/' $HOME/visensor_ws/src/mav_control_rw/mav_nonlinear_mpc/CMakeLists.txt
+
+            catkin build
+        else 
+            git checkout devel
+            cd $HOME/visensor_ws
+            catkin build visensor_simulator
+        fi
+
+        source $HOME/visensor_ws/devel/setup.$(ps -p $$ -oargs=)
+
+        echo "Terminated\n
+        \n
+        \t try to run: roslaunch visensor_simulator uav_vi_blender.launch"
     fi
 }
 
@@ -239,7 +503,7 @@ check_pip_package(){
         echo "Installing $1"
         pip install -U $1
     else
-        echo "$1 already installed"
+       ls echo "$1 already installed"
     fi
 }
 
